@@ -130,26 +130,6 @@ JsonValue buildLoggerConfiguration(Level level, const std::string& logfile) {
   return loggerConfiguration;
 }
 
-void renameDataDir() {
-  std::string concealXDir = Tools::getDefaultDataDirectory();
-  boost::filesystem::path concealXDirPath(concealXDir);
-  if (boost::filesystem::exists(concealXDirPath)) {
-    return;
-  }
-
-  std::string dataDirPrefix = concealXDir.substr(0, concealXDir.size() + 1 - sizeof(CRYPTONOTE_NAME));
-  boost::filesystem::path cediDirPath(dataDirPrefix + "BXC");
-
-  if (boost::filesystem::exists(cediDirPath)) {
-    boost::filesystem::rename(cediDirPath, concealXDirPath);
-  } else {
-    boost::filesystem::path BcediDirPath(dataDirPrefix + "Bcedi");
-    if (boost::filesystem::exists(boost::filesystem::path(BcediDirPath))) {
-		boost::filesystem::rename(BcediDirPath, concealXDirPath);
-    }
-  }
-}
-
 int main(int argc, char* argv[])
 {
 
@@ -161,8 +141,6 @@ int main(int argc, char* argv[])
   LoggerRef logger(logManager, "daemon");
 
   try {
-    renameDataDir();
-
     po::options_description desc_cmd_only("Command line options");
     po::options_description desc_cmd_sett("Command line options and settings options");
 
@@ -199,7 +177,7 @@ int main(int argc, char* argv[])
 
       if (command_line::get_arg(vm, command_line::arg_help))
       {
-        std::cout << CryptoNote::CRYPTONOTE_NAME << " v" << PROJECT_VERSION_LONG << ENDL << ENDL;
+        std::cout << CryptoNote::CRYPTONOTE_NAME << " v" << PROJECT_VERSION << ENDL << ENDL;
         std::cout << desc_options << std::endl;
         return false;
       }
@@ -248,7 +226,7 @@ int main(int argc, char* argv[])
     // configure logging
     logManager.configure(buildLoggerConfiguration(cfgLogLevel, cfgLogFile));
 
-    logger(INFO, BRIGHT_YELLOW) << "Conceal v" << PROJECT_VERSION_LONG;
+    logger(INFO, BRIGHT_YELLOW) << "Conceal v" << PROJECT_VERSION;
 
     if (command_line_preprocessor(vm, logger)) {
       return 0;
@@ -395,7 +373,7 @@ bool command_line_preprocessor(const boost::program_options::variables_map &vm, 
   bool exit = false;
 
   if (command_line::get_arg(vm, command_line::arg_version)) {
-    std::cout << CryptoNote::CRYPTONOTE_NAME << " v" << PROJECT_VERSION_LONG << ENDL;
+    std::cout << CryptoNote::CRYPTONOTE_NAME << " v" << PROJECT_VERSION << ENDL;
     exit = true;
   }
 

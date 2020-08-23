@@ -1,20 +1,15 @@
 cmake_minimum_required(VERSION 2.8.6)
 
-set(VERSION "0.1")
-# Packaged from main commits
-set(COMMIT 72946d9)
-set(REFS " (HEAD -> master)")
+set(VERSION "0.0.1")
 
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
-set(CMAKE_CONFIGURATION_TYPES Debug RelWithDebInfo Release CACHE TYPE INTERNAL)
-set(CMAKE_SKIP_INSTALL_RULES ON)
 set(CMAKE_SKIP_PACKAGE_ALL_DEPENDENCY ON)
 set(CMAKE_SUPPRESS_REGENERATION ON)
 
-project(concealX)
+project(projectE) # Change this when the project has a name.
 
 include_directories(include src external "${CMAKE_BINARY_DIR}/version")
 
@@ -116,38 +111,9 @@ elseif(NOT MSVC)
   set(Boost_LIBRARIES "${Boost_LIBRARIES};rt")
 endif()
 
-# option(BUILD_TESTS "Build tests." ON)
-
-if(BUILD_TESTS)
-  add_subdirectory(tests)
-  enable_testing()
-endif()
-
-set(COMMIT_ID_IN_VERSION ON CACHE BOOL "Include commit ID in version")
 file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/version")
-if (NOT COMMIT_ID_IN_VERSION)
-  set(VERSION "${VERSION}-unknown")
-  configure_file("src/version.h.in" "version/version.h")
-  add_custom_target(version ALL)
-elseif(DEFINED COMMIT)
-  string(REPLACE "." "\\." VERSION_RE "${VERSION}")
-  if(NOT REFS MATCHES "(\\(|, )tag: v${VERSION_RE}(\\)|, )")
-    set(VERSION "${VERSION}-g${COMMIT}")
-  endif()
-  configure_file("src/version.h.in" "version/version.h")
-  add_custom_target(version ALL)
-else()
-  find_package(Git QUIET)
-  if(Git_FOUND OR GIT_FOUND)
-    message(STATUS "Found Git: ${GIT_EXECUTABLE}")
-    add_custom_target(version ALL "${CMAKE_COMMAND}" "-D" "VERSION=${VERSION}" "-D" "GIT=${GIT_EXECUTABLE}" "-D" "TO=${CMAKE_BINARY_DIR}/version/version.h" "-P" "src/version.cmake" WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
-  else()
-    message(STATUS "WARNING: Git was not found!")
-    set(VERSION "${VERSION}-unknown")
-    configure_file("src/version.h.in" "version/version.h")
-    add_custom_target(version ALL)
-  endif()
-endif()
+configure_file("src/version.h.in" "version/version.h")
+add_custom_target(version ALL)
 
 add_subdirectory(external)
 add_subdirectory(src)
