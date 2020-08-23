@@ -68,49 +68,6 @@ void print_genesis_tx_hex() {
   return;
 }
 
-// void print_genesis_tx_hex(const po::variables_map& vm) {
-  // std::vector<CryptoNote::AccountPublicAddress> targets;
- //  auto genesis_block_reward_addresses = command_line::get_arg(vm, arg_genesis_block_reward_address);
-
-//   Logging::ConsoleLogger logger;
-//   CryptoNote::CurrencyBuilder currencyBuilder(logger);
-
- //  CryptoNote::Currency currency = currencyBuilder.currency();
-
- //  for (const auto& address_string : genesis_block_reward_addresses) {
- //     CryptoNote::AccountPublicAddress address;
-   //  if (!currency.parseAccountAddressString(address_string, address)) {
-   //    std::cout << "Failed to parse address: " << address_string << std::endl;
-   //    return;
-  //   }
- //	//Print GENESIS_BLOCK_REWARD Mined Address
- //	std::cout << "Your SDN Pre-mined Address String is:  " << address_string << std::endl;
- //    targets.emplace_back(std::move(address));
-//   }
-
- //  if (targets.empty()) {
- //    if (CryptoNote::parameters::GENESIS_BLOCK_REWARD > 0) {
- //      std::cout << "Error: genesis block reward addresses are not defined" << std::endl;
- //    } else {
-
- //	  CryptoNote::Transaction tx = CryptoNote::CurrencyBuilder(logger).generateGenesisTransaction();
- //	  CryptoNote::BinaryArray txb = CryptoNote::toBinaryArray(tx);
- //	  std::string tx_hex = Common::toHex(txb);
-
-// 	  std::cout << "Insert this line into your coin configuration file as is: " << std::endl;
- //	  std::cout << "const char GENESIS_COINBASE_TX_HEX[] = \"" << tx_hex << "\";" << std::endl;
- //	}
-//   } else {
- //	CryptoNote::Transaction tx = CryptoNote::CurrencyBuilder(logger).generateGenesisTransaction(targets);
- //	CryptoNote::BinaryArray txb = CryptoNote::toBinaryArray(tx);
- //	std::string tx_hex = Common::toHex(txb);
-
- //	std::cout << "Modify this line into your concealX configuration file as is:  " << std::endl;
- //	std::cout << "const char GENESIS_COINBASE_TX_HEX[] = \"" << tx_hex << "\";" << std::endl;
-//   }
-//   return;
-// }
-
 JsonValue buildLoggerConfiguration(Level level, const std::string& logfile) {
   JsonValue loggerConfiguration(JsonValue::OBJECT);
   loggerConfiguration.insert("globalLevel", static_cast<int64_t>(level));
@@ -226,7 +183,7 @@ int main(int argc, char* argv[])
     // configure logging
     logManager.configure(buildLoggerConfiguration(cfgLogLevel, cfgLogFile));
 
-    logger(INFO, BRIGHT_YELLOW) << "Conceal v" << PROJECT_VERSION;
+    logger(INFO, BRIGHT_YELLOW) << "Project-E v" << PROJECT_VERSION;
 
     if (command_line_preprocessor(vm, logger)) {
       return 0;
