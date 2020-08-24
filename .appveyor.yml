@@ -15,7 +15,7 @@ after_build:
   - cd src\Release
   - mkdir projecte-%APPVEYOR_BUILD_NUMBER%
   - copy *.exe projecte-%APPVEYOR_BUILD_NUMBER%
-  - copy ..\..\..\LICENSE projecte-%APPVEYOR_BUILD_NUMBER%
+  - copy ..\..\..\LICENSE.md projecte-%APPVEYOR_BUILD_NUMBER%
   - 7z a projecte-%APPVEYOR_BUILD_NUMBER%-windows.zip projecte-%APPVEYOR_BUILD_NUMBER%
   - copy projecte-%APPVEYOR_BUILD_NUMBER%-windows.zip ..\..\..\
   
