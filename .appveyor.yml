@@ -1,0 +1,24 @@
+os: Visual Studio 2017
+
+environment:
+  BOOST_ROOT: C:\Libraries\boost_1_67_0
+  BOOST_LIBRARYDIR: C:\Libraries\boost_1_67_0\lib64-msvc-14
+
+build_script:
+  - md build
+  - cd build
+  - cmake -G "Visual Studio 16 2019 Win64" ..
+  - MSBuild projecte.sln /p:Configuration=Release /m
+   
+after_build: 
+  - if not defined APPVEYOR_BUILD_NUMBER (set APPVEYOR_BUILD_NUMBER=%APPVEYOR_BUILD_ID%)
+  - cd src\Release
+  - mkdir projecte-%APPVEYOR_BUILD_NUMBER%
+  - copy *.exe projecte-%APPVEYOR_BUILD_NUMBER%
+  - copy ..\..\..\LICENSE projecte-%APPVEYOR_BUILD_NUMBER%
+  - 7z a projecte-%APPVEYOR_BUILD_NUMBER%-windows.zip projecte-%APPVEYOR_BUILD_NUMBER%
+  - copy projecte-%APPVEYOR_BUILD_NUMBER%-windows.zip ..\..\..\
+  
+artifacts:
+  - path: projecte-$(APPVEYOR_BUILD_NUMBER)-windows.zip
+    name: projecte
