@@ -132,46 +132,6 @@ namespace CryptoNote
 
   /* ---------------------------------------------------------------------------------------------------- */
 
-  size_t Currency::difficultyWindowByBlockVersion(uint8_t blockMajorVersion) const
-  {
-    if (blockMajorVersion >= BLOCK_MAJOR_VERSION_4)
-    {
-      return parameters::DIFFICULTY_WINDOW_V3;
-    }
-    else if (blockMajorVersion >= BLOCK_MAJOR_VERSION_2)
-    {
-      return m_difficultyWindow;
-    }
-    else if (blockMajorVersion == BLOCK_MAJOR_VERSION_1)
-    {
-      return parameters::DIFFICULTY_WINDOW_V2;
-    }
-    else
-    {
-      return parameters::DIFFICULTY_WINDOW_V1;
-    }
-  }
-
-  /* ---------------------------------------------------------------------------------------------------- */
-
-  size_t Currency::difficultyCutByBlockVersion(uint8_t blockMajorVersion) const
-  {
-    if (blockMajorVersion >= BLOCK_MAJOR_VERSION_2)
-    {
-      return m_difficultyCut;
-    }
-    else if (blockMajorVersion == BLOCK_MAJOR_VERSION_1)
-    {
-      return parameters::DIFFICULTY_CUT_V2;
-    }
-    else
-    {
-      return parameters::DIFFICULTY_CUT_V1;
-    }
-  }
-
-  /* ---------------------------------------------------------------------------------------------------- */
-
   uint64_t Currency::baseRewardFunction(uint64_t alreadyGeneratedCoins, uint32_t height) const
   {
     if (height == 1)
@@ -195,25 +155,7 @@ namespace CryptoNote
     if (majorVersion == BLOCK_MAJOR_VERSION_2)
     {
       return m_upgradeHeightV2;
-    }
-    else if (majorVersion == BLOCK_MAJOR_VERSION_3)
-    {
-      return m_upgradeHeightV3;
-    }
-    else if (majorVersion == BLOCK_MAJOR_VERSION_4)
-    {
-      return m_upgradeHeightV6;
-    }
-    else if (majorVersion == BLOCK_MAJOR_VERSION_7)
-    {
-      return m_upgradeHeightV7;
-    }
-    else if (majorVersion == BLOCK_MAJOR_VERSION_8)
-    {
-      return m_upgradeHeightV8;
-    }
-    else
-    {
+    } else {
       return static_cast<uint32_t>(-1);
     }
   }
@@ -245,142 +187,7 @@ namespace CryptoNote
 
   /* ---------------------------------------------------------------------------------------------------- */
 
-  uint64_t Currency::calculateInterest(uint64_t amount, uint32_t term, uint32_t height) const
-  {
-
-    /* deposits 3.0 and investments 1.0 */
-    if ((term % 21900 == 0) && (height > parameters::DEPOSIT_HEIGHT_V3))
-    {
-      return calculateInterestV3(amount, term);
-    }
-
-    /* deposits 2.0 and investments 1.0 */
-    if (term % 64800 == 0)
-    {
-      return calculateInterestV2(amount, term);
-    }
-
-    if (term % 5040 == 0)
-    {
-      return calculateInterestV2(amount, term);
-    }
-
-    uint64_t a = static_cast<uint64_t>(term) * m_depositMaxTotalRate - m_depositMinTotalRateFactor;
-    uint64_t bHi;
-    uint64_t bLo = mul128(amount, a, &bHi);
-    uint64_t cHi;
-    uint64_t cLo;
-    assert(std::numeric_limits<uint32_t>::max() / 100 > m_depositMaxTerm);
-    div128_32(bHi, bLo, static_cast<uint32_t>(100 * m_depositMaxTerm), &cHi, &cLo);
-    assert(cHi == 0);
-
-    /* early deposit multiplier */
-    uint64_t interestHi;
-    uint64_t interestLo;
-    if (height <= CryptoNote::parameters::END_MULTIPLIER_BLOCK)
-    {
-      interestLo = mul128(cLo, CryptoNote::parameters::MULTIPLIER_FACTOR, &interestHi);
-      assert(interestHi == 0);
-    }
-    else
-    {
-      interestHi = cHi;
-      interestLo = cLo;
-    }
-    return interestLo;
-  }
-
-  /* ---------------------------------------------------------------------------------------------------- */
-
-  uint64_t Currency::calculateInterestV2(uint64_t amount, uint32_t term) const
-  {
-
-    uint64_t returnVal = 0;
-
-    /* investments */
-    if (term % 64800 == 0)
-    {
-
-      /* minimum 50000 for investments */
-      uint64_t amount4Humans = amount / 1000000;
-      assert(amount4Humans >= 50000);
-
-      /* quantity tiers */
-      float qTier = 1;
-      if (amount4Humans > 110000 && amount4Humans < 180000)
-        qTier = static_cast<float>(1.01);
-
-      if (amount4Humans >= 180000 && amount4Humans < 260000)
-        qTier = static_cast<float>(1.02);
-
-      if (amount4Humans >= 260000 && amount4Humans < 350000)
-        qTier = static_cast<float>(1.03);
-
-      if (amount4Humans >= 350000 && amount4Humans < 450000)
-        qTier = static_cast<float>(1.04);
-
-      if (amount4Humans >= 450000 && amount4Humans < 560000)
-        qTier = static_cast<float>(1.05);
-
-      if (amount4Humans >= 560000 && amount4Humans < 680000)
-        qTier = static_cast<float>(1.06);
-
-      if (amount4Humans >= 680000 && amount4Humans < 810000)
-        qTier = static_cast<float>(1.07);
-
-      if (amount4Humans >= 810000 && amount4Humans < 950000)
-        qTier = static_cast<float>(1.08);
-
-      if (amount4Humans >= 950000 && amount4Humans < 1100000)
-        qTier = static_cast<float>(1.09);
-
-      if (amount4Humans >= 1100000 && amount4Humans < 1260000)
-        qTier = static_cast<float>(1.1);
-
-      if (amount4Humans >= 1260000 && amount4Humans < 1430000)
-        qTier = static_cast<float>(1.11);
-
-      if (amount4Humans >= 1430000 && amount4Humans < 1610000)
-        qTier = static_cast<float>(1.12);
-
-      if (amount4Humans >= 1610000 && amount4Humans < 1800000)
-        qTier = static_cast<float>(1.13);
-
-      if (amount4Humans >= 1800000 && amount4Humans < 2000000)
-        qTier = static_cast<float>(1.14);
-
-      if (amount4Humans > 2000000)
-        qTier = static_cast<float>(1.15);
-
-      float mq = static_cast<float>(1.4473);
-      float termQuarters = term / 64800;
-      float m8 = 100.0 * pow(1.0 + (mq / 100.0), termQuarters) - 100.0;
-      float m5 = termQuarters * 0.5;
-      float m7 = m8 * (1 + (m5 / 100));
-      float rate = m7 * qTier;
-      float interest = amount * (rate / 100);
-      returnVal = static_cast<uint64_t>(interest);
-      return returnVal;
-    }
-
-    /* weekly deposits */
-    if (term % 5040 == 0)
-    {
-      uint64_t actualAmount = amount;
-      float weeks = term / 5040;
-      float baseInterest = static_cast<float>(0.0696);
-      float interestPerWeek = static_cast<float>(0.0002);
-      float interestRate = baseInterest + (weeks * interestPerWeek);
-      float interest = actualAmount * ((weeks * interestRate) / 100);
-      returnVal = static_cast<uint64_t>(interest);
-      return returnVal;
-    }
-
-    return returnVal;
-
-  } /* Currency::calculateInterestV2 */
-
-  uint64_t Currency::calculateInterestV3(uint64_t amount, uint32_t term) const
+  uint64_t Currency::calculateInterest(uint64_t amount, uint32_t term) const
   {
 
     uint64_t returnVal = 0;
@@ -408,11 +215,11 @@ namespace CryptoNote
     float interest = amount * eir;
     returnVal = static_cast<uint64_t>(interest);
     return returnVal;
-  } /* Currency::calculateInterestV3 */
+  }
 
   /* ---------------------------------------------------------------------------------------------------- */
 
-  uint64_t Currency::calculateTotalTransactionInterest(const Transaction &tx, uint32_t height) const
+  uint64_t Currency::calculateTotalTransactionInterest(const Transaction &tx) const
   {
     uint64_t interest = 0;
     for (const TransactionInput &input : tx.inputs)
@@ -422,7 +229,7 @@ namespace CryptoNote
         const MultisignatureInput &multisignatureInput = boost::get<MultisignatureInput>(input);
         if (multisignatureInput.term != 0)
         {
-          interest += calculateInterest(multisignatureInput.amount, multisignatureInput.term, height);
+          interest += calculateInterest(multisignatureInput.amount, multisignatureInput.term);
         }
       }
     }
@@ -447,7 +254,7 @@ namespace CryptoNote
       }
       else
       {
-        return multisignatureInput.amount + calculateInterest(multisignatureInput.amount, multisignatureInput.term, height);
+        return multisignatureInput.amount + calculateInterest(multisignatureInput.amount, multisignatureInput.term);
       }
     }
     else if (in.type() == typeid(BaseInput))
@@ -716,7 +523,7 @@ namespace CryptoNote
       return false;
     }
 
-    if (height < CryptoNote::parameters::UPGRADE_HEIGHT_V4 && amount < defaultDustThreshold())
+    if (amount < defaultDustThreshold())
     {
       return false;
     }
@@ -841,221 +648,6 @@ namespace CryptoNote
     return Common::fromString(strAmount, amount);
   }
 
-  /* ---------------------------------------------------------------------------------------------------- */
-
-  difficulty_type Currency::nextDifficulty(std::vector<uint64_t> timestamps, std::vector<difficulty_type> cumulativeDifficulties) const
-  {
-    assert(m_difficultyWindow >= 2);
-
-    if (timestamps.size() > m_difficultyWindow)
-    {
-      timestamps.resize(m_difficultyWindow);
-      cumulativeDifficulties.resize(m_difficultyWindow);
-    }
-
-    size_t length = timestamps.size();
-    assert(length == cumulativeDifficulties.size());
-    assert(length <= m_difficultyWindow);
-    if (length <= 1)
-    {
-      return 1;
-    }
-
-    sort(timestamps.begin(), timestamps.end());
-
-    size_t cutBegin, cutEnd;
-    assert(2 * m_difficultyCut <= m_difficultyWindow - 2);
-    if (length <= m_difficultyWindow - 2 * m_difficultyCut)
-    {
-      cutBegin = 0;
-      cutEnd = length;
-    }
-    else
-    {
-      cutBegin = (length - (m_difficultyWindow - 2 * m_difficultyCut) + 1) / 2;
-      cutEnd = cutBegin + (m_difficultyWindow - 2 * m_difficultyCut);
-    }
-
-    assert(/*cut_begin >= 0 &&*/ cutBegin + 2 <= cutEnd && cutEnd <= length);
-    uint64_t timeSpan = timestamps[cutEnd - 1] - timestamps[cutBegin];
-    if (timeSpan == 0)
-    {
-      timeSpan = 1;
-    }
-
-    difficulty_type totalWork = cumulativeDifficulties[cutEnd - 1] - cumulativeDifficulties[cutBegin];
-    assert(totalWork > 0);
-
-    uint64_t low, high;
-    low = mul128(totalWork, m_difficultyTarget, &high);
-    if (high != 0 || low + timeSpan - 1 < low)
-    {
-      return 0;
-    }
-
-    return (low + timeSpan - 1) / timeSpan;
-  }
-
-  /* ---------------------------------------------------------------------------------------------------- */
-
-  difficulty_type Currency::nextDifficulty(uint8_t version, uint32_t blockIndex, std::vector<uint64_t> timestamps, std::vector<difficulty_type> cumulativeDifficulties) const
-  {
-
-    // manual diff set hack
-    if (blockIndex >= 12750 && blockIndex < 13500)
-    {
-      return 2160;
-    }
-
-    std::vector<uint64_t> timestamps_o(timestamps);
-    std::vector<uint64_t> cumulativeDifficulties_o(cumulativeDifficulties);
-    size_t c_difficultyWindow = difficultyWindowByBlockVersion(version);
-    size_t c_difficultyCut = difficultyCutByBlockVersion(version);
-
-    assert(c_difficultyWindow >= 2);
-
-    if (timestamps.size() > c_difficultyWindow)
-    {
-      timestamps.resize(c_difficultyWindow);
-      cumulativeDifficulties.resize(c_difficultyWindow);
-    }
-
-    size_t length = timestamps.size();
-    assert(length == cumulativeDifficulties.size());
-    assert(length <= c_difficultyWindow);
-    if (length <= 1)
-    {
-      return 1;
-    }
-
-    sort(timestamps.begin(), timestamps.end());
-
-    size_t cutBegin, cutEnd;
-    assert(2 * c_difficultyCut <= c_difficultyWindow - 2);
-    if (length <= c_difficultyWindow - 2 * c_difficultyCut)
-    {
-      cutBegin = 0;
-      cutEnd = length;
-    }
-    else
-    {
-      cutBegin = (length - (c_difficultyWindow - 2 * c_difficultyCut) + 1) / 2;
-      cutEnd = cutBegin + (c_difficultyWindow - 2 * c_difficultyCut);
-    }
-
-    assert(/*cut_begin >= 0 &&*/ cutBegin + 2 <= cutEnd && cutEnd <= length);
-    uint64_t timeSpan = timestamps[cutEnd - 1] - timestamps[cutBegin];
-    if (timeSpan == 0)
-    {
-      timeSpan = 1;
-    }
-
-    difficulty_type totalWork = cumulativeDifficulties[cutEnd - 1] - cumulativeDifficulties[cutBegin];
-    assert(totalWork > 0);
-
-    uint64_t low, high;
-    low = mul128(totalWork, m_difficultyTarget, &high);
-    if (high != 0 || std::numeric_limits<uint64_t>::max() - low < (timeSpan - 1))
-    {
-      return 0;
-    }
-
-    uint8_t c_zawyDifficultyBlockVersion = m_zawyDifficultyBlockVersion;
-    if (m_zawyDifficultyV2)
-    {
-      c_zawyDifficultyBlockVersion = 2;
-    }
-
-    if (version >= c_zawyDifficultyBlockVersion && c_zawyDifficultyBlockVersion)
-    {
-      if (high != 0)
-      {
-        return 0;
-      }
-      uint64_t nextDiffZ = low / timeSpan;
-
-      return nextDiffZ;
-    }
-
-    if (m_zawyDifficultyBlockIndex && m_zawyDifficultyBlockIndex <= blockIndex)
-    {
-      if (high != 0)
-      {
-        return 0;
-      }
-
-      /*
-      Recalculating 'low' and 'timespan' with hardcoded values:
-      DIFFICULTY_CUT=0
-      DIFFICULTY_LAG=0
-      DIFFICULTY_WINDOW=17
-    */
-      c_difficultyWindow = 17;
-      c_difficultyCut = 0;
-
-      assert(c_difficultyWindow >= 2);
-
-      size_t t_difficultyWindow = c_difficultyWindow;
-      if (c_difficultyWindow > timestamps.size())
-      {
-        t_difficultyWindow = timestamps.size();
-      }
-
-      std::vector<uint64_t> timestamps_tmp(timestamps_o.end() - t_difficultyWindow, timestamps_o.end());
-      std::vector<uint64_t> cumulativeDifficulties_tmp(cumulativeDifficulties_o.end() - t_difficultyWindow, cumulativeDifficulties_o.end());
-
-      length = timestamps_tmp.size();
-      assert(length == cumulativeDifficulties_tmp.size());
-      assert(length <= c_difficultyWindow);
-      if (length <= 1)
-      {
-        return 1;
-      }
-
-      sort(timestamps_tmp.begin(), timestamps_tmp.end());
-
-      assert(2 * c_difficultyCut <= c_difficultyWindow - 2);
-      if (length <= c_difficultyWindow - 2 * c_difficultyCut)
-      {
-        cutBegin = 0;
-        cutEnd = length;
-      }
-      else
-      {
-        cutBegin = (length - (c_difficultyWindow - 2 * c_difficultyCut) + 1) / 2;
-        cutEnd = cutBegin + (c_difficultyWindow - 2 * c_difficultyCut);
-      }
-
-      assert(/*cut_begin >= 0 &&*/ cutBegin + 2 <= cutEnd && cutEnd <= length);
-      timeSpan = timestamps_tmp[cutEnd - 1] - timestamps_tmp[cutBegin];
-      if (timeSpan == 0)
-      {
-        timeSpan = 1;
-      }
-
-      totalWork = cumulativeDifficulties_tmp[cutEnd - 1] - cumulativeDifficulties_tmp[cutBegin];
-      assert(totalWork > 0);
-
-      low = mul128(totalWork, m_difficultyTarget, &high);
-      if (high != 0 || std::numeric_limits<uint64_t>::max() - low < (timeSpan - 1))
-      {
-        return 0;
-      }
-
-      uint64_t nextDiffZ = low / timeSpan;
-      if (nextDiffZ <= 100)
-      {
-        nextDiffZ = 100;
-      }
-
-      return nextDiffZ;
-    }
-
-    return (low + timeSpan - 1) / timeSpan;
-  }
-
-  /* ---------------------------------------------------------------------------------------------------- */
-
   // LWMA-3 difficulty algorithm (commented version)
   // Copyright (c) 2017-2018 Zawy, MIT License
   // https://github.com/zawy12/difficulty-algorithms/issues/3
@@ -1073,12 +665,16 @@ namespace CryptoNote
   // https://github.com/graft-project/GraftNetwork/pull/118/files
 
   // difficulty_type should be uint64_t
-  difficulty_type Currency::nextDifficultyLWMA3(std::vector<std::uint64_t> timestamps, std::vector<difficulty_type> cumulative_difficulties) const
+  difficulty_type Currency::LWMA3Difficulty(std::vector<std::uint64_t> timestamps, std::vector<difficulty_type> cumulative_difficulties) const
   {
-
     uint64_t T = 120; // target solvetime seconds
     uint64_t N = 60;  //  N=45, 60, and 90 for T=600, 120, 60.
     uint64_t L(0), ST, sum_3_ST(0), next_D, prev_D, this_timestamp, previous_timestamp;
+
+    /* Dont use LWMA3 to calculate the genesis block */
+    size_t length = timestamps.size();
+    assert(length <= m_difficultyWindow);
+    if (length <= 1) { return 1; }
 
     // Make sure timestamps & CD vectors are not bigger than they are supposed to be.
     assert(timestamps.size() == cumulative_difficulties.size() &&
@@ -1087,13 +683,11 @@ namespace CryptoNote
     // If it's a new coin, do startup code.
     // Increase difficulty_guess if it needs to be much higher, but guess lower than lowest guess.
     uint64_t difficulty_guess = 100;
-    if (timestamps.size() <= 10)
-    {
+    if (timestamps.size() <= 10) {
       return difficulty_guess;
     }
     // Use "if" instead of "else if" in case vectors are incorrectly N all the time instead of N+1.
-    if (timestamps.size() < N + 1)
-    {
+    if (timestamps.size() < N + 1) {
       N = timestamps.size() - 1;
     }
 
@@ -1103,16 +697,12 @@ namespace CryptoNote
 
     // N is most recently solved block.
     previous_timestamp = timestamps[0];
-    for (uint64_t i = 1; i <= N; i++)
-    {
+    for (uint64_t i = 1; i <= N; i++) {
       // prevent out-of-sequence timestamps in a way that prevents
       // an exploit caused by "if ST< 0 then ST = 0"
-      if (timestamps[i] > previous_timestamp)
-      {
+      if (timestamps[i] > previous_timestamp) {
         this_timestamp = timestamps[i];
-      }
-      else
-      {
+      } else {
         this_timestamp = previous_timestamp + 1;
       }
       // Limit solvetime ST to 6*T to prevent large drop in difficulty that could cause oscillations.
@@ -1120,8 +710,7 @@ namespace CryptoNote
       previous_timestamp = this_timestamp;
       L += ST * i; // give linearly higher weight to more recent solvetimes
                    // delete the following line if you do not want the "jump rule"
-      if (i > N - 3)
-      {
+      if (i > N - 3) {
         sum_3_ST += ST;
       } // used below to check for hashrate jumps
     }
@@ -1143,90 +732,6 @@ namespace CryptoNote
     return next_D;
 
     // next_Target = sumTargets*L*2/0.998/T/(N+1)/N/N; // To show the difference.
-  }
-
-  // LWMA-1 difficulty algorithm
-  // Copyright (c) 2017-2018 Zawy, MIT License
-  // See commented link below for required config file changes. Fix FTL and MTP.
-  // https://github.com/zawy12/difficulty-algorithms/issues/3
-  // The following comments can be deleted.
-  // Bitcoin clones must lower their FTL. See Bitcoin/Zcash code on the page above.
-  // Cryptonote et al coins must make the following changes:
-  // BLOCKCHAIN_TIMESTAMP_CHECK_WINDOW  = 11; // aka "MTP"
-  // DIFFICULTY_WINDOW  = 60; //  N=60, 90, and 150 for T=600, 120, 60.
-  // BLOCK_FUTURE_TIME_LIMIT = DIFFICULTY_WINDOW * DIFFICULTY_TARGET / 20;
-  // Warning Bytecoin/Karbo clones may not have the following, so check TS & CD vectors size=N+1
-  // DIFFICULTY_BLOCKS_COUNT = DIFFICULTY_WINDOW+1;
-  // The BLOCKS_COUNT is to make timestamps & cumulative_difficulty vectors size N+1
-  //  If your coin uses network time instead of node local time, lowering FTL < about 125% of
-  // the "revert to node time" rule (70 minutes in BCH, ZEC, & BTC) will allow a 33% Sybil attack
-  // on your nodes.  So revert rule must be ~ FTL/2 instead of 70 minutes.   See:
-  // https://github.com/zcash/zcash/issues/4021
-
-  difficulty_type Currency::nextDifficultyLWMA1(
-      std::vector<std::uint64_t> timestamps, 
-      std::vector<difficulty_type> cumulative_difficulties, 
-      uint64_t height) const
-  {
-    uint64_t  T = 120;
-    uint64_t  N = 120; 
-
-    // Genesis should be the only time sizes are < N+1.
-    assert(timestamps.size() == cumulative_difficulties.size() && timestamps.size() <= N + 1);
-
-    // Hard code D if there are not at least N+1 BLOCKS after fork (or genesis)
-    // This helps a lot in preventing a very common problem in CN forks from conflicting difficulties.
-
-    assert(timestamps.size() == N + 1);
-
-    uint64_t L(0), next_D, i, this_timestamp(0), previous_timestamp(0), avg_D;
-
-    previous_timestamp = timestamps[0] - T;
-    for (i = 1; i <= N; i++)
-    {
-      // Safely prevent out-of-sequence timestamps
-      if (timestamps[i] > previous_timestamp)
-      {
-        this_timestamp = timestamps[i];
-      }
-      else
-      {
-        this_timestamp = previous_timestamp + 1;
-      }
-      L += i * std::min(6 * T, this_timestamp - previous_timestamp);
-      previous_timestamp = this_timestamp;
-    }
-    if (L < N * N * T / 20)
-    {
-      L = N * N * T / 20;
-    }
-    avg_D = (cumulative_difficulties[N] - cumulative_difficulties[0]) / N;
-
-    // Prevent round off error for small D and overflow for large D.
-    if (avg_D > 2000000 * N * N * T)
-    {
-      next_D = (avg_D / (200 * L)) * (N * (N + 1) * T * 99);
-    }
-    else
-    {
-      next_D = (avg_D * N * (N + 1) * T * 99) / (200 * L);
-    }
-
-    // Optional. Make all insignificant digits zero for easy reading.
-    i = 1000000000;
-    while (i > 1)
-    {
-      if (next_D > i * 100)
-      {
-        next_D = ((next_D + i / 2) / i) * i;
-        break;
-      }
-      else
-      {
-        i /= 10;
-      }
-    }
-    return next_D;
   }
 
   /* ---------------------------------------------------------------------------------------------------- */
@@ -1280,9 +785,7 @@ namespace CryptoNote
     minedMoneyUnlockWindow(parameters::CRYPTONOTE_MINED_MONEY_UNLOCK_WINDOW);
 
     timestampCheckWindow(parameters::BLOCKCHAIN_TIMESTAMP_CHECK_WINDOW);
-    timestampCheckWindow_v1(parameters::BLOCKCHAIN_TIMESTAMP_CHECK_WINDOW_V1);
     blockFutureTimeLimit(parameters::CRYPTONOTE_BLOCK_FUTURE_TIME_LIMIT);
-    blockFutureTimeLimit_v1(parameters::CRYPTONOTE_BLOCK_FUTURE_TIME_LIMIT_V1);
 
     moneySupply(parameters::MONEY_SUPPLY);
     //genesisBlockReward(parameters::GENESIS_BLOCK_REWARD);
@@ -1299,19 +802,15 @@ namespace CryptoNote
     numberOfDecimalPlaces(parameters::CRYPTONOTE_DISPLAY_DECIMAL_POINT);
 
     minimumFee(parameters::MINIMUM_FEE);
-    minimumFeeV1(parameters::MINIMUM_FEE_V1);
     minimumFeeBanking(parameters::MINIMUM_FEE_BANKING);
     defaultDustThreshold(parameters::DEFAULT_DUST_THRESHOLD);
 
     difficultyTarget(parameters::DIFFICULTY_TARGET);
     difficultyWindow(parameters::DIFFICULTY_WINDOW);
-    difficultyLag(parameters::DIFFICULTY_LAG);
-    difficultyCut(parameters::DIFFICULTY_CUT);
 
     depositMinAmount(parameters::DEPOSIT_MIN_AMOUNT);
     depositMinTerm(parameters::DEPOSIT_MIN_TERM);
     depositMaxTerm(parameters::DEPOSIT_MAX_TERM);
-    depositMaxTermV1(parameters::DEPOSIT_MAX_TERM_V1);
     depositMinTotalRateFactor(parameters::DEPOSIT_MIN_TOTAL_RATE_FACTOR);
     depositMaxTotalRate(parameters::DEPOSIT_MAX_TOTAL_RATE);
 
@@ -1327,10 +826,6 @@ namespace CryptoNote
     numberOfPeriodsToForgetTxDeletedFromPool(parameters::CRYPTONOTE_NUMBER_OF_PERIODS_TO_FORGET_TX_DELETED_FROM_POOL);
 
     upgradeHeightV2(parameters::UPGRADE_HEIGHT_V2);
-    upgradeHeightV3(parameters::UPGRADE_HEIGHT_V3);
-    upgradeHeightV6(parameters::UPGRADE_HEIGHT_V6);
-    upgradeHeightV7(parameters::UPGRADE_HEIGHT_V7);
-    upgradeHeightV8(parameters::UPGRADE_HEIGHT_V8);
     upgradeVotingThreshold(parameters::UPGRADE_VOTING_THRESHOLD);
     upgradeVotingWindow(parameters::UPGRADE_VOTING_WINDOW);
     upgradeWindow(parameters::UPGRADE_WINDOW);

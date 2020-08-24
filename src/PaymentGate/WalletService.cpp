@@ -1662,7 +1662,7 @@ namespace PaymentService
           return make_error_code(CryptoNote::error::DEPOSIT_TERM_TOO_SMALL);
         }
 
-        if (term > CryptoNote::parameters::DEPOSIT_MAX_TERM_V3)
+        if (term > CryptoNote::parameters::DEPOSIT_MAX_TERM)
         {
           return make_error_code(CryptoNote::error::DEPOSIT_TERM_TOO_BIG);
         }
@@ -1728,12 +1728,12 @@ namespace PaymentService
 
         /* Now validate the deposit term and the amount */
 
-        if (term < CryptoNote::parameters::DEPOSIT_MIN_TERM_V3)
+        if (term < CryptoNote::parameters::DEPOSIT_MIN_TERM)
         {
           return make_error_code(CryptoNote::error::DEPOSIT_TERM_TOO_SMALL);
         }
 
-        if (term > CryptoNote::parameters::DEPOSIT_MAX_TERM_V3)
+        if (term > CryptoNote::parameters::DEPOSIT_MAX_TERM)
         {
           return make_error_code(CryptoNote::error::DEPOSIT_TERM_TOO_BIG);
         }

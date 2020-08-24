@@ -385,11 +385,7 @@ namespace CryptoNote
                                                                                                                               m_current_block_cumul_sz_limit(0),
                                                                                                                               m_checkpoints(logger),
                                                                                                                               m_blockchainIndexesEnabled(blockchainIndexesEnabled),
-                                                                                                                              m_upgradeDetectorV2(currency, m_blocks, BLOCK_MAJOR_VERSION_2, logger),
-                                                                                                                              m_upgradeDetectorV3(currency, m_blocks, BLOCK_MAJOR_VERSION_3, logger),
-                                                                                                                              m_upgradeDetectorV4(currency, m_blocks, BLOCK_MAJOR_VERSION_4, logger),
-                                                                                                                              m_upgradeDetectorV7(currency, m_blocks, BLOCK_MAJOR_VERSION_7, logger),
-                                                                                                                              m_upgradeDetectorV8(currency, m_blocks, BLOCK_MAJOR_VERSION_8, logger)
+                                                                                                                              m_upgradeDetectorV2(currency, m_blocks, BLOCK_MAJOR_VERSION_2, logger)
 
   {
   }
@@ -578,30 +574,6 @@ namespace CryptoNote
       return false;
     }
 
-    if (!m_upgradeDetectorV3.init())
-    {
-      logger(ERROR, BRIGHT_RED) << "Failed to initialize upgrade detector";
-      return false;
-    }
-
-    if (!m_upgradeDetectorV4.init())
-    {
-      logger(ERROR, BRIGHT_RED) << "Failed to initialize upgrade detector";
-      return false;
-    }
-
-    if (!m_upgradeDetectorV7.init())
-    {
-      logger(ERROR, BRIGHT_RED) << "Failed to initialize upgrade detector";
-      return false;
-    }
-
-    if (!m_upgradeDetectorV8.init())
-    {
-      logger(ERROR, BRIGHT_RED) << "Failed to initialize upgrade detector";
-      return false;
-    }
-
     update_next_comulative_size_limit();
 
     uint64_t timestamp_diff = time(NULL) - m_blocks.back().bl.timestamp;
@@ -698,7 +670,7 @@ namespace CryptoNote
           }
         }
 
-        interest += m_currency.calculateTotalTransactionInterest(transaction.tx, b); //block.height); //block.height shows 0 wrongly sometimes apparently
+        interest += m_currency.calculateTotalTransactionInterest(transaction.tx); //block.height); //block.height shows 0 wrongly sometimes apparently
       }
 
       pushToDepositIndex(block, interest);
@@ -862,10 +834,9 @@ namespace CryptoNote
     std::lock_guard<decltype(m_blockchain_lock)> lk(m_blockchain_lock);
     std::vector<uint64_t> timestamps;
     std::vector<difficulty_type> commulative_difficulties;
+    size_t DFC = CryptoNote::parameters::DIFFICULTY_BLOCKS_COUNT;
 
-    uint8_t BlockMajorVersion = getBlockMajorVersionForHeight(static_cast<uint32_t>(m_blocks.size()));
-
-    size_t offset = m_blocks.size() - std::min(m_blocks.size(), static_cast<uint64_t>(m_currency.difficultyBlocksCountByBlockVersion(BlockMajorVersion)));
+    size_t offset = m_blocks.size() - std::min(m_blocks.size(), static_cast<uint64_t>(DFC));
     if (offset == 0)
     {
       ++offset;
@@ -877,21 +848,7 @@ namespace CryptoNote
       commulative_difficulties.push_back(m_blocks[offset].cumulative_difficulty);
     }
 
-    uint64_t block_index = m_blocks.size();
-    uint8_t block_major_version = get_block_major_version_for_height(block_index + 1);
-
-    if (block_major_version >= 8)
-    {
-      return m_currency.nextDifficultyLWMA1(timestamps, commulative_difficulties, block_index);
-    }
-    else if (block_major_version >= 4)
-    {
-      return m_currency.nextDifficultyLWMA3(timestamps, commulative_difficulties);
-    }
-    else
-    {
-      return m_currency.nextDifficulty(block_major_version, block_index, timestamps, commulative_difficulties);
-    }
+    return m_currency.LWMA3Difficulty(timestamps, commulative_difficulties);
   }
 
   uint64_t Blockchain::getBlockTimestamp(uint32_t height)
@@ -935,23 +892,7 @@ namespace CryptoNote
 
   uint8_t Blockchain::get_block_major_version_for_height(uint64_t height) const
   {
-    if (height > m_upgradeDetectorV8.upgradeHeight())
-    {
-      return m_upgradeDetectorV8.targetVersion();
-    }
-    else if (height > m_upgradeDetectorV7.upgradeHeight())
-    {
-      return m_upgradeDetectorV7.targetVersion();
-    }
-    else if (height > m_upgradeDetectorV4.upgradeHeight())
-    {
-      return m_upgradeDetectorV4.targetVersion();
-    }
-    else if (height > m_upgradeDetectorV3.upgradeHeight())
-    {
-      return m_upgradeDetectorV3.targetVersion();
-    }
-    else if (height > m_upgradeDetectorV2.upgradeHeight())
+    if (height > m_upgradeDetectorV2.upgradeHeight())
     {
       return m_upgradeDetectorV2.targetVersion();
     }
@@ -1111,23 +1052,7 @@ namespace CryptoNote
 
   uint8_t Blockchain::getBlockMajorVersionForHeight(uint32_t height) const
   {
-    if (height > m_upgradeDetectorV8.upgradeHeight())
-    {
-      return m_upgradeDetectorV8.targetVersion();
-    }
-    else if (height > m_upgradeDetectorV7.upgradeHeight())
-    {
-      return m_upgradeDetectorV7.targetVersion();
-    }
-    else if (height > m_upgradeDetectorV4.upgradeHeight())
-    {
-      return m_upgradeDetectorV4.targetVersion();
-    }
-    else if (height > m_upgradeDetectorV3.upgradeHeight())
-    {
-      return m_upgradeDetectorV3.targetVersion();
-    }
-    else if (height > m_upgradeDetectorV2.upgradeHeight())
+    if (height > m_upgradeDetectorV2.upgradeHeight())
     {
       return m_upgradeDetectorV2.targetVersion();
     }
@@ -1141,44 +1066,10 @@ namespace CryptoNote
   {
     std::vector<uint64_t> timestamps;
     std::vector<difficulty_type> commulative_difficulties;
-    uint8_t BlockMajorVersion = getBlockMajorVersionForHeight(static_cast<uint32_t>(m_blocks.size()));
+    size_t DFC = getBlockMajorVersionForHeight(alt_chain.size());
 
-    if (alt_chain.size() < m_currency.difficultyBlocksCountByBlockVersion(BlockMajorVersion))
-    {
-      std::lock_guard<decltype(m_blockchain_lock)> lk(m_blockchain_lock);
-      size_t main_chain_stop_offset = alt_chain.size() ? alt_chain.front()->second.height : bei.height;
-      size_t main_chain_count = m_currency.difficultyBlocksCountByBlockVersion(BlockMajorVersion) - std::min(m_currency.difficultyBlocksCountByBlockVersion(BlockMajorVersion), alt_chain.size());
-      main_chain_count = std::min(main_chain_count, main_chain_stop_offset);
-      size_t main_chain_start_offset = main_chain_stop_offset - main_chain_count;
-
-      // skip genesis block
-      if (!main_chain_start_offset)
-      {
-        ++main_chain_start_offset;
-      }
-
-      for (; main_chain_start_offset < main_chain_stop_offset; ++main_chain_start_offset)
-      {
-        timestamps.push_back(m_blocks[main_chain_start_offset].bl.timestamp);
-        commulative_difficulties.push_back(m_blocks[main_chain_start_offset].cumulative_difficulty);
-      }
-
-      if (!((alt_chain.size() + timestamps.size()) <= m_currency.difficultyBlocksCountByBlockVersion(BlockMajorVersion)))
-      {
-        logger(ERROR, BRIGHT_RED) << "Internal error, alt_chain.size()[" << alt_chain.size() << "] + timestamps.size()[" << timestamps.size() << "] NOT <= m_currency.difficultyBlocksCountByBlockVersion(BlockMajorVersion)[" << m_currency.difficultyBlocksCountByBlockVersion(BlockMajorVersion) << ']';
-        return false;
-      }
-
-      for (auto it : alt_chain)
-      {
-        timestamps.push_back(it->second.bl.timestamp);
-        commulative_difficulties.push_back(it->second.cumulative_difficulty);
-      }
-    }
-    else
-    {
-      timestamps.resize(std::min(alt_chain.size(), m_currency.difficultyBlocksCountByBlockVersion(BlockMajorVersion)));
-      commulative_difficulties.resize(std::min(alt_chain.size(), m_currency.difficultyBlocksCountByBlockVersion(BlockMajorVersion)));
+      timestamps.resize(std::min(alt_chain.size(), DFC));
+      commulative_difficulties.resize(std::min(alt_chain.size(), DFC));
       size_t count = 0;
       size_t max_i = timestamps.size() - 1;
       BOOST_REVERSE_FOREACH(auto it, alt_chain)
@@ -1186,28 +1077,13 @@ namespace CryptoNote
         timestamps[max_i - count] = it->second.bl.timestamp;
         commulative_difficulties[max_i - count] = it->second.cumulative_difficulty;
         count++;
-        if (count >= m_currency.difficultyBlocksCountByBlockVersion(BlockMajorVersion))
+        if (count >= DFC)
         {
           break;
         }
       }
-    }
 
-    uint32_t block_index = m_blocks.size();
-    uint8_t block_major_version = get_block_major_version_for_height(block_index + 1);
-
-    if (block_major_version >= 8)
-    {
-      return m_currency.nextDifficultyLWMA1(timestamps, commulative_difficulties, block_index);
-    }
-    else if (block_major_version >= 4)
-    {
-      return m_currency.nextDifficultyLWMA3(timestamps, commulative_difficulties);
-    }
-    else
-    {
-      return m_currency.nextDifficulty(block_major_version, block_index, timestamps, commulative_difficulties);
-    }
+    return m_currency.LWMA3Difficulty(timestamps, commulative_difficulties);
   }
 
   bool Blockchain::prevalidate_miner_transaction(const Block &b, uint32_t height)
@@ -1499,7 +1375,7 @@ namespace CryptoNote
 
       // Disable merged mining
       TransactionExtraMergeMiningTag mmTag;
-      if (getMergeMiningTagFromExtra(bei.bl.baseTransaction.extra, mmTag) && bei.height >= CryptoNote::parameters::UPGRADE_HEIGHT_V6)
+      if (getMergeMiningTagFromExtra(bei.bl.baseTransaction.extra, mmTag) && bei.height >= CryptoNote::parameters::UPGRADE_HEIGHT_V2)
       {
         logger(ERROR, BRIGHT_RED) << "Merge mining tag was found in extra of miner transaction";
         return false;
@@ -2136,9 +2012,9 @@ namespace CryptoNote
       return false;
     }
 
-    if (getCurrentBlockchainHeight() > CryptoNote::parameters::UPGRADE_HEIGHT_V4 && getCurrentBlockchainHeight() < CryptoNote::parameters::UPGRADE_HEIGHT_V5 && txin.outputIndexes.size() < 3)
+    if (txin.outputIndexes.size() < CryptoNote::parameters::MINIMUM_MIXIN)
     {
-      logger(ERROR, BRIGHT_RED) << "ring size is too small: " << txin.outputIndexes.size() << " Expected: 4";
+      logger(ERROR, BRIGHT_RED) << "ring size is too small: " << txin.outputIndexes.size() << " Expected: " + CryptoNote::parameters::MINIMUM_MIXIN;
       return false;
     }
 
@@ -2184,7 +2060,7 @@ namespace CryptoNote
           const auto &multisignatureOutput = ::boost::get<MultisignatureOutput>(out.target);
           if (multisignatureOutput.term != 0)
           {
-            if (multisignatureOutput.term < m_currency.depositMinTerm() || multisignatureOutput.term > m_currency.depositMaxTermV1())
+            if (multisignatureOutput.term < m_currency.depositMinTerm() || multisignatureOutput.term > m_currency.depositMaxTerm())
             {
               logger(INFO, BRIGHT_WHITE) << getObjectHash(tx) << " multisignature output has invalid term: " << multisignatureOutput.term;
               return false;
@@ -2406,7 +2282,7 @@ namespace CryptoNote
     TransactionExtraMergeMiningTag mmTag;
     if (m_blockIndex.getBlockHeight(blockHash, height))
     {
-      if (getMergeMiningTagFromExtra(blockData.baseTransaction.extra, mmTag) && height >= CryptoNote::parameters::UPGRADE_HEIGHT_V6)
+      if (getMergeMiningTagFromExtra(blockData.baseTransaction.extra, mmTag) && height >= CryptoNote::parameters::UPGRADE_HEIGHT_V2)
       {
         logger(ERROR, BRIGHT_RED) << "Merge mining tag was found in extra of miner transaction";
         return false;
@@ -2448,9 +2324,7 @@ namespace CryptoNote
         bvc.m_verification_failed = true;
         return false;
       }
-    }
-    else
-    {
+    } else {
       if (!m_currency.checkProofOfWork(m_cn_context, blockData, currentDifficulty, proof_of_work))
       {
         logger(INFO, BRIGHT_WHITE) << "Block " << blockHash << ", has too weak proof of work: " << Common::podToHex(proof_of_work) << ", expected difficulty: " << currentDifficulty << " MajorVersion: " << std::to_string(blockData.majorVersion);
@@ -2528,7 +2402,7 @@ namespace CryptoNote
 
       cumulative_block_size += blob_size;
       fee_summary += fee;
-      interestSummary += m_currency.calculateTotalTransactionInterest(transactions[i], block.height);
+      interestSummary += m_currency.calculateTotalTransactionInterest(transactions[i]);
     }
 
     if (!checkCumulativeBlockSize(blockHash, cumulative_block_size, block.height))
@@ -2572,10 +2446,6 @@ namespace CryptoNote
     bvc.m_added_to_main_chain = true;
 
     m_upgradeDetectorV2.blockPushed();
-    m_upgradeDetectorV3.blockPushed();
-    m_upgradeDetectorV4.blockPushed();
-    m_upgradeDetectorV7.blockPushed();
-    m_upgradeDetectorV8.blockPushed();
     update_next_comulative_size_limit();
 
     return true;
@@ -2675,10 +2545,6 @@ namespace CryptoNote
     assert(m_blockIndex.size() == m_blocks.size());
 
     m_upgradeDetectorV2.blockPopped();
-    m_upgradeDetectorV3.blockPopped();
-    m_upgradeDetectorV4.blockPopped();
-    m_upgradeDetectorV7.blockPopped();
-    m_upgradeDetectorV8.blockPopped();
   }
 
   bool Blockchain::pushTransaction(BlockEntry &block, const Crypto::Hash &transactionHash, TransactionIndex transactionIndex)

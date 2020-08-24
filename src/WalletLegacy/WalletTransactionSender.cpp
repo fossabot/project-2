@@ -266,7 +266,7 @@ namespace CryptoNote
   {
 
     throwIf(term < m_currency.depositMinTerm(), error::DEPOSIT_TERM_TOO_SMALL);
-    throwIf(term > m_currency.depositMaxTermV1(), error::DEPOSIT_TERM_TOO_BIG);
+    throwIf(term > m_currency.depositMaxTerm(), error::DEPOSIT_TERM_TOO_BIG);
     throwIf(amount < m_currency.depositMinAmount(), error::DEPOSIT_AMOUNT_TOO_SMALL);
 
     uint64_t neededMoney = getSumWithOverflowCheck(amount, fee);
@@ -513,7 +513,7 @@ namespace CryptoNote
       deposit.creatingTransactionId = context->transactionId;
       deposit.spendingTransactionId = WALLET_LEGACY_INVALID_TRANSACTION_ID;
       uint32_t height = transactionInfo.blockHeight;
-      deposit.interest = m_currency.calculateInterest(deposit.amount, deposit.term, height);
+      deposit.interest = m_currency.calculateInterest(deposit.amount, deposit.term);
       deposit.locked = true;
       DepositId depositId = m_transactionsCache.insertDeposit(deposit, depositIndex, transaction->getTransactionHash());
       transactionInfo.firstDepositId = depositId;

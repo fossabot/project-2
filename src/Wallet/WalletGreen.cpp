@@ -65,7 +65,7 @@ namespace
   {
     int index = 0;
     return std::accumulate(transfers.begin(), transfers.end(), static_cast<uint64_t>(0), [&currency, &index, heights](uint64_t sum, const CryptoNote::TransactionOutputInformation &deposit) {
-      return sum + deposit.amount + currency.calculateInterest(deposit.amount, deposit.term, heights[index++]);
+      return sum + deposit.amount + currency.calculateInterest(deposit.amount, deposit.term);
     });
   }
 
@@ -2306,8 +2306,8 @@ namespace CryptoNote
 
     /* Take the amount of time a block can potentially be in the past/future */
     std::initializer_list<uint64_t> limits = {
-        CryptoNote::parameters::CRYPTONOTE_BLOCK_FUTURE_TIME_LIMIT,
-        CryptoNote::parameters::CRYPTONOTE_BLOCK_FUTURE_TIME_LIMIT_V1};
+      CryptoNote::parameters::CRYPTONOTE_BLOCK_FUTURE_TIME_LIMIT
+    };
 
     /* Get the largest adjustment possible */
     uint64_t adjust = std::max(limits);
@@ -3345,7 +3345,7 @@ namespace CryptoNote
     deposit.creatingTransactionId = creatingTransactionId;
     deposit.term = depositOutput.term;
     deposit.spendingTransactionId = WALLET_INVALID_TRANSACTION_ID;
-    deposit.interest = currency.calculateInterest(deposit.amount, deposit.term, height);
+    deposit.interest = currency.calculateInterest(deposit.amount, deposit.term);
     deposit.height = height;
     deposit.unlockHeight = height + depositOutput.term;
     deposit.locked = true;
@@ -3888,7 +3888,6 @@ namespace CryptoNote
     std::unique_ptr<ITransaction> fusionTransaction;
     size_t transactionSize;
     int round = 0;
-    uint64_t transactionAmount;
     do
     {
       if (round != 0)
@@ -3900,8 +3899,6 @@ namespace CryptoNote
       uint64_t inputsAmount = std::accumulate(fusionInputs.begin(), fusionInputs.end(), static_cast<uint64_t>(0), [](uint64_t amount, const OutputToTransfer &input) {
         return amount + input.out.amount;
       });
-
-      transactionAmount = inputsAmount;
 
       ReceiverAmounts decomposedOutputs = decomposeFusionOutputs(destination, inputsAmount);
       assert(decomposedOutputs.amounts.size() <= MAX_FUSION_OUTPUT_COUNT);
