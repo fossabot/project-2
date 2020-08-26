@@ -16,38 +16,49 @@ namespace CryptoNote {
     const size_t   MAX_BLOCK_BLOB_SIZE = 500000000;
     const size_t   MAX_TX_SIZE = 1000000000;
 
-    const uint64_t PUBLIC_ADDRESS_BASE58_PREFIX = 0x7ad4; /* ccx7 address prefix */
-    const size_t   MINED_COINS_UNLOCK_WINDOW = 10; /* 20 minutes */
-    const uint64_t DEFAULT_TX_SPENDABLE_AGE = 30; /* ~1 hour */
+    /* ccx7 address prefix */
+    const uint64_t PUBLIC_ADDRESS_BASE58_PREFIX = 0x7ad4;
+    /* 20 minutes */
+    const size_t   MINED_COINS_UNLOCK_WINDOW = 10;
+    const uint64_t DEFAULT_TX_SPENDABLE_AGE = 10;
 
-    const uint64_t MONEY_SUPPLY = UINT64_C(200000000000000); /* max supply: 200M (Consensus II) */
+    /* 200M */
+    const uint64_t MONEY_SUPPLY = UINT64_C(200000000000000); 
     const size_t   MINIMUM_MIXIN = 4;
     const size_t   DECIMAL_POINT = 6;
-    const uint64_t COIN = UINT64_C(1000000);			  /* smallest atomic unit */
+    /* smallest atomic unit */
+    const uint64_t COIN = UINT64_C(1000000);
     const uint64_t POINT = UINT64_C(1000);
-    const uint64_t MINIMUM_FEE = UINT64_C(1000);          /* 0.001000 CCX */
-    const uint64_t MINIMUM_FEE_BANKING = UINT64_C(1000);  /* 0.001000 CCX */
-    const uint64_t DEFAULT_DUST_THRESHOLD = UINT64_C(10); /* 0.000010 CCX */
+    /* 0.001000 CCX */
+    const uint64_t MINIMUM_FEE = UINT64_C(1000);
+    const uint64_t MINIMUM_FEE_BANKING = UINT64_C(1000);
+    /* 0.000010 CCX */ 
+    const uint64_t DEFAULT_DUST_THRESHOLD = UINT64_C(10);
 
     const uint64_t MULTIPLIER_FACTOR = 100;
     const uint32_t END_MULTIPLIER_BLOCK = 12750;
 
-    const uint64_t BLOCK_FUTURE_TIME_LIMIT = 360; /* Works with LWMA3 */
-    const size_t   BLOCKCHAIN_TIMESTAMP_CHECK_WINDOW = 11; /* Works with LWMA-3 */
-    const uint64_t DIFFICULTY_TARGET = 120;												 /* two minutes */
-    const uint64_t EXPECTED_NUMBER_OF_BLOCKS_PER_DAY = 24 * 60 * 60 / DIFFICULTY_TARGET; /* 720 blocks */
+    /* two minutes */
+    const uint64_t DIFFICULTY_TARGET = 120; 
     const size_t   DIFFICULTY_WINDOW = 120;
-    const size_t   DIFFICULTY_BLOCKS_COUNT = DIFFICULTY_WINDOW + 1; /* added for LWMA3 */
+    /* Works with LWMA3 */
+    const uint64_t BLOCK_FUTURE_TIME_LIMIT = 360;
+    const size_t   BLOCKCHAIN_TIMESTAMP_CHECK_WINDOW = 11;
+    const size_t   DIFFICULTY_BLOCKS_COUNT = DIFFICULTY_WINDOW + 1;
+    /* 720 blocks */
+    const uint64_t EXPECTED_NUMBER_OF_BLOCKS_PER_DAY = 24 * 60 * 60 / DIFFICULTY_TARGET;
 
     const size_t   REWARD_BLOCKS_WINDOW = 100;
-    const size_t   BLOCK_GRANTED_FULL_REWARD_ZONE = 100000; /* size of block in bytes, after which reward is calculated using block size */
     const size_t   COINBASE_BLOB_RESERVED_SIZE = 600;
+    const size_t   BLOCK_GRANTED_FULL_REWARD_ZONE = 100000;
 
     const uint64_t DEPOSIT_MIN_AMOUNT = 1 * COIN;
-    const uint32_t DEPOSIT_MIN_TERM = 21900;				 /* one week */
-    const uint32_t DEPOSIT_MAX_TERM = 1 * 12 * 21900;	 /* legacy deposts - one year */
-    const uint64_t DEPOSIT_MIN_TOTAL_RATE_FACTOR = 0;	 /* constant rate */
-    const uint64_t DEPOSIT_MAX_TOTAL_RATE = 4;			 /* legacy deposits */
+    /* one week */
+    const uint32_t DEPOSIT_MIN_TERM = 21900;
+    /* one year */
+    const uint32_t DEPOSIT_MAX_TERM = 1 * 12 * 21900;
+    const uint64_t DEPOSIT_MIN_TOTAL_RATE_FACTOR = 0;
+    const uint64_t DEPOSIT_MAX_TOTAL_RATE = 4;
 
     const size_t   MAX_BLOCK_SIZE_INITIAL = BLOCK_GRANTED_FULL_REWARD_ZONE * 10;
     const uint64_t MAX_BLOCK_SIZE_GROWTH_SPEED_NUMERATOR = 100 * 1024;
@@ -77,10 +88,14 @@ namespace CryptoNote {
     static_assert(UPGRADE_VOTING_WINDOW > 1, "Bad UPGRADE_VOTING_WINDOW");
   } // namespace parameters
 
-	const uint64_t START_BLOCK_REWARD = (UINT64_C(5000) * parameters::POINT);  // start rewar
-	const uint64_t FOUNDATION_TRUST = (UINT64_C(12000000) * parameters::COIN); // locked funds to secure network
-	const uint64_t MAX_BLOCK_REWARD = (UINT64_C(15) * parameters::COIN);	   // max rewar
-	const uint64_t REWARD_INCREASE_INTERVAL = (UINT64_C(21900));			   // aprox. 1 month (+ 0.25 CCX increment per month)
+  /* start reward */
+	const uint64_t START_BLOCK_REWARD = (UINT64_C(5000) * parameters::POINT);
+  /* block 1 premine */
+	const uint64_t FOUNDATION_TRUST = (UINT64_C(12000000) * parameters::COIN);
+  /* max reward */
+	const uint64_t MAX_BLOCK_REWARD = (UINT64_C(15) * parameters::COIN);
+  /* aprox. 1 month */  
+	const uint64_t REWARD_INCREASE_INTERVAL = (UINT64_C(21900));
 
 	const char     PROJECT_NAME[] = "conceal";
 	const char     GENESIS_COINBASE_TX_HEX[] = "010a01ff0001c096b102029b2e4c0281c0b02e7c53291a94d1d0cbff8883f8024f5142ee494ffbbd08807121017d6775185749e95ac2d70cae3f29e0e46f430ab648abbe9fdc61d8e7437c60f8";
@@ -109,17 +124,21 @@ namespace CryptoNote {
 
 	const size_t   P2P_LOCAL_WHITE_PEERLIST_LIMIT = 1000;
 	const size_t   P2P_LOCAL_GRAY_PEERLIST_LIMIT = 5000;
-	const size_t   P2P_CONNECTION_MAX_WRITE_BUFFER_SIZE = 64 * 1024 * 1024; // 64MB
+	const size_t   P2P_CONNECTION_MAX_WRITE_BUFFER_SIZE = 64 * 1024 * 1024;
 	const uint32_t P2P_DEFAULT_CONNECTIONS_COUNT = 8;
 	const size_t   P2P_DEFAULT_ANCHOR_CONNECTIONS_COUNT = 2;
-	const size_t   P2P_DEFAULT_WHITELIST_CONNECTIONS_PERCENT = 70; // percent
-	const uint32_t P2P_DEFAULT_HANDSHAKE_INTERVAL = 60;			 // seconds
-	const uint32_t P2P_DEFAULT_PACKET_MAX_SIZE = 50000000;		 // 50000000 bytes maximum packet size
+	const size_t   P2P_DEFAULT_WHITELIST_CONNECTIONS_PERCENT = 70;
+  /* seconds */
+	const uint32_t P2P_DEFAULT_HANDSHAKE_INTERVAL = 60;
+	const uint32_t P2P_DEFAULT_PACKET_MAX_SIZE = 50000000;
 	const uint32_t P2P_DEFAULT_PEERS_IN_HANDSHAKE = 250;
-	const uint32_t P2P_DEFAULT_CONNECTION_TIMEOUT = 5000;	   // 5 seconds
-	const uint32_t P2P_DEFAULT_PING_CONNECTION_TIMEOUT = 2000; // 2 seconds
-	const uint64_t P2P_DEFAULT_INVOKE_TIMEOUT = 60 * 2 * 1000; // 2 minutes
-	const size_t   P2P_DEFAULT_HANDSHAKE_INVOKE_TIMEOUT = 5000;  // 5 seconds
+  /* 2 seconds */
+	const uint32_t P2P_DEFAULT_PING_CONNECTION_TIMEOUT = 2000;
+  /* 5 seconds */
+	const uint32_t P2P_DEFAULT_CONNECTION_TIMEOUT = 5000;
+	const size_t   P2P_DEFAULT_HANDSHAKE_INVOKE_TIMEOUT = 5000;
+  /* 2 minutes */
+	const uint64_t P2P_DEFAULT_INVOKE_TIMEOUT = 60 * 2 * 1000;
 	const char     P2P_STAT_TRUSTED_PUB_KEY[] = "0000000000000000000000000000000000000000000000000000000000000000";
 } // namespace CryptoNote
 
