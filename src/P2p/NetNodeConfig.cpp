@@ -12,6 +12,7 @@
 #include "Common/CommandLine.h"
 #include "Common/StringTools.h"
 #include "crypto/crypto.h"
+#include "Logging/FileLog.h"
 #include "CryptoNoteConfig.h"
 
 namespace CryptoNote {

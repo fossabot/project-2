@@ -1415,7 +1415,7 @@ namespace PaymentService
 
     /* Create the integrated address the same way you make a public address */
     integrated_address = Tools::Base58::encode_addr(
-        CryptoNote::parameters::CRYPTONOTE_PUBLIC_ADDRESS_BASE58_PREFIX,
+        CryptoNote::parameters::PUBLIC_ADDRESS_BASE58_PREFIX,
         payment_id_str + keys);
 
     return std::error_code();
@@ -1440,7 +1440,7 @@ namespace PaymentService
     }
 
     /* Check if the prefix is correct */
-    if (prefix != CryptoNote::parameters::CRYPTONOTE_PUBLIC_ADDRESS_BASE58_PREFIX)
+    if (prefix != CryptoNote::parameters::PUBLIC_ADDRESS_BASE58_PREFIX)
     {
       return make_error_code(CryptoNote::error::BAD_PREFIX);
     }

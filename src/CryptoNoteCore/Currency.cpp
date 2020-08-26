@@ -13,6 +13,7 @@
 #include "../Common/StringTools.h"
 
 #include "CryptoNoteConfig.h"
+#include "Logging/FileLog.h"
 #include "Account.h"
 #include "CryptoNoteBasicImpl.h"
 #include "CryptoNoteFormatUtils.h"
@@ -654,7 +655,7 @@ namespace CryptoNote
   // Bitcoin clones must lower their FTL.
   // Cryptonote et al coins must make the following changes:
   // #define BLOCKCHAIN_TIMESTAMP_CHECK_WINDOW X    11
-  // #define CRYPTONOTE_BLOCK_FUTURE_TIME_LIMIT X        3 * DIFFICULTY_TARGET
+  // #define BLOCK_FUTURE_TIME_LIMIT X        3 * DIFFICULTY_TARGET
   // #define DIFFICULTY_WINDOW X                     60 //  N=45, 60, and 90 for T=600, 120, 60.
   // Bytecoin / Karbo clones may not have the following
   // #define DIFFICULTY_BLOCKS_COUNT       DIFFICULTY_WINDOW+1 X
@@ -778,28 +779,24 @@ namespace CryptoNote
 
   CurrencyBuilder::CurrencyBuilder(Logging::ILogger &log) : m_currency(log)
   {
-    maxBlockNumber(parameters::CRYPTONOTE_MAX_BLOCK_NUMBER);
-    maxBlockBlobSize(parameters::CRYPTONOTE_MAX_BLOCK_BLOB_SIZE);
-    maxTxSize(parameters::CRYPTONOTE_MAX_TX_SIZE);
-    publicAddressBase58Prefix(parameters::CRYPTONOTE_PUBLIC_ADDRESS_BASE58_PREFIX);
-    minedMoneyUnlockWindow(parameters::CRYPTONOTE_MINED_MONEY_UNLOCK_WINDOW);
+    maxBlockNumber(parameters::MAX_BLOCK_NUMBER);
+    maxBlockBlobSize(parameters::MAX_BLOCK_BLOB_SIZE);
+    maxTxSize(parameters::MAX_TX_SIZE);
+    publicAddressBase58Prefix(parameters::PUBLIC_ADDRESS_BASE58_PREFIX);
+    minedMoneyUnlockWindow(parameters::MINED_COINS_UNLOCK_WINDOW);
 
     timestampCheckWindow(parameters::BLOCKCHAIN_TIMESTAMP_CHECK_WINDOW);
-    blockFutureTimeLimit(parameters::CRYPTONOTE_BLOCK_FUTURE_TIME_LIMIT);
+    blockFutureTimeLimit(parameters::BLOCK_FUTURE_TIME_LIMIT);
 
     moneySupply(parameters::MONEY_SUPPLY);
     //genesisBlockReward(parameters::GENESIS_BLOCK_REWARD);
 
-    rewardBlocksWindow(parameters::CRYPTONOTE_REWARD_BLOCKS_WINDOW);
+    rewardBlocksWindow(parameters::REWARD_BLOCKS_WINDOW);
 
-    zawyDifficultyBlockIndex(parameters::ZAWY_DIFFICULTY_BLOCK_INDEX);
-    zawyDifficultyV2(parameters::ZAWY_DIFFICULTY_FIX);
-    zawyDifficultyBlockVersion(parameters::ZAWY_DIFFICULTY_BLOCK_VERSION);
+    blockGrantedFullRewardZone(parameters::BLOCK_GRANTED_FULL_REWARD_ZONE);
+    minerTxBlobReservedSize(parameters::COINBASE_BLOB_RESERVED_SIZE);
 
-    blockGrantedFullRewardZone(parameters::CRYPTONOTE_BLOCK_GRANTED_FULL_REWARD_ZONE);
-    minerTxBlobReservedSize(parameters::CRYPTONOTE_COINBASE_BLOB_RESERVED_SIZE);
-
-    numberOfDecimalPlaces(parameters::CRYPTONOTE_DISPLAY_DECIMAL_POINT);
+    numberOfDecimalPlaces(parameters::DECIMAL_POINT);
 
     minimumFee(parameters::MINIMUM_FEE);
     minimumFeeBanking(parameters::MINIMUM_FEE_BANKING);
@@ -818,19 +815,19 @@ namespace CryptoNote
     maxBlockSizeGrowthSpeedNumerator(parameters::MAX_BLOCK_SIZE_GROWTH_SPEED_NUMERATOR);
     maxBlockSizeGrowthSpeedDenominator(parameters::MAX_BLOCK_SIZE_GROWTH_SPEED_DENOMINATOR);
 
-    lockedTxAllowedDeltaSeconds(parameters::CRYPTONOTE_LOCKED_TX_ALLOWED_DELTA_SECONDS);
-    lockedTxAllowedDeltaBlocks(parameters::CRYPTONOTE_LOCKED_TX_ALLOWED_DELTA_BLOCKS);
+    lockedTxAllowedDeltaSeconds(parameters::LOCKED_TX_ALLOWED_DELTA_SECONDS);
+    lockedTxAllowedDeltaBlocks(parameters::LOCKED_TX_ALLOWED_DELTA_BLOCKS);
 
-    mempoolTxLiveTime(parameters::CRYPTONOTE_MEMPOOL_TX_LIVETIME);
-    mempoolTxFromAltBlockLiveTime(parameters::CRYPTONOTE_MEMPOOL_TX_FROM_ALT_BLOCK_LIVETIME);
-    numberOfPeriodsToForgetTxDeletedFromPool(parameters::CRYPTONOTE_NUMBER_OF_PERIODS_TO_FORGET_TX_DELETED_FROM_POOL);
+    mempoolTxLiveTime(parameters::MEMPOOL_TX_LIVETIME);
+    mempoolTxFromAltBlockLiveTime(parameters::MEMPOOL_TX_FROM_ALT_BLOCK_LIVETIME);
+    numberOfPeriodsToForgetTxDeletedFromPool(parameters::NUMBER_OF_PERIODS_TO_FORGET_TX_DELETED_FROM_POOL);
 
     upgradeHeightV2(parameters::UPGRADE_HEIGHT_V2);
     upgradeVotingThreshold(parameters::UPGRADE_VOTING_THRESHOLD);
     upgradeVotingWindow(parameters::UPGRADE_VOTING_WINDOW);
     upgradeWindow(parameters::UPGRADE_WINDOW);
 
-    transactionMaxSize(parameters::CRYPTONOTE_MAX_TX_SIZE_LIMIT);
+    transactionMaxSize(parameters::MAX_TX_SIZE_LIMIT);
     fusionTxMaxSize(parameters::FUSION_TX_MAX_SIZE);
     fusionTxMinInputCount(parameters::FUSION_TX_MIN_INPUT_COUNT);
     fusionTxMinInOutCountRatio(parameters::FUSION_TX_MIN_IN_OUT_COUNT_RATIO);

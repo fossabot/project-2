@@ -43,7 +43,7 @@ namespace po = boost::program_options;
 
 namespace
 {
-  const command_line::arg_descriptor<std::string> arg_config_file = {"config-file", "Specify configuration file", std::string(CryptoNote::CRYPTONOTE_NAME) + ".conf"};
+  const command_line::arg_descriptor<std::string> arg_config_file = {"config-file", "Specify configuration file", std::string(CryptoNote::PROJECT_NAME) + ".conf"};
   const command_line::arg_descriptor<bool>        arg_os_version  = {"os-version", ""};
   const command_line::arg_descriptor<std::string> arg_log_file    = {"log-file", "", ""};
   const command_line::arg_descriptor<std::string> arg_set_fee_address = { "fee-address", "Set a fee address for remote nodes", "" };
@@ -137,7 +137,7 @@ int main(int argc, char* argv[])
 
       if (command_line::get_arg(vm, command_line::arg_help))
       {
-        std::cout << CryptoNote::CRYPTONOTE_NAME << " v" << PROJECT_VERSION << ENDL << ENDL;
+        std::cout << CryptoNote::PROJECT_NAME << " v" << PROJECT_VERSION << ENDL << ENDL;
         std::cout << desc_options << std::endl;
         return false;
       }
@@ -206,7 +206,7 @@ int main(int argc, char* argv[])
     try {
       currencyBuilder.currency();
     } catch (std::exception&) {
-      std::cout << "GENESIS_COINBASE_TX_HEX constant has an incorrect value. Please launch: " << CryptoNote::CRYPTONOTE_NAME << "d --" << arg_print_genesis_tx.name;
+      std::cout << "GENESIS_COINBASE_TX_HEX constant has an incorrect value. Please launch: " << CryptoNote::PROJECT_NAME << "d --" << arg_print_genesis_tx.name;
       return 1;
     }
 
@@ -351,7 +351,7 @@ bool command_line_preprocessor(const boost::program_options::variables_map &vm, 
   bool exit = false;
 
   if (command_line::get_arg(vm, command_line::arg_version)) {
-    std::cout << CryptoNote::CRYPTONOTE_NAME << " v" << PROJECT_VERSION << ENDL;
+    std::cout << CryptoNote::PROJECT_NAME << " v" << PROJECT_VERSION << ENDL;
     exit = true;
   }
 

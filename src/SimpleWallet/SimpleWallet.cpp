@@ -209,7 +209,7 @@ struct TransferCommand {
               return true;
             }
 
-            std::string address = CryptoNote::getAccountAddressAsStr(CryptoNote::parameters::CRYPTONOTE_PUBLIC_ADDRESS_BASE58_PREFIX, 
+            std::string address = CryptoNote::getAccountAddressAsStr(CryptoNote::parameters::PUBLIC_ADDRESS_BASE58_PREFIX, 
                                                                     addr);   
             arg = address;
           }
@@ -992,7 +992,7 @@ bool simple_wallet::new_wallet(const std::string &wallet_file, const std::string
     m_wallet->getAccountKeys(keys);
 
     std::string secretKeysData = std::string(reinterpret_cast<char*>(&keys.spendSecretKey), sizeof(keys.spendSecretKey)) + std::string(reinterpret_cast<char*>(&keys.viewSecretKey), sizeof(keys.viewSecretKey));
-    std::string guiKeys = Tools::Base58::encode_addr(CryptoNote::parameters::CRYPTONOTE_PUBLIC_ADDRESS_BASE58_PREFIX, secretKeysData);
+    std::string guiKeys = Tools::Base58::encode_addr(CryptoNote::parameters::PUBLIC_ADDRESS_BASE58_PREFIX, secretKeysData);
 
     std::cout << "Wallet Address: " << m_wallet->getAddress() << std::endl;
     std::cout << "Private spend key: " << Common::podToHex(keys.spendSecretKey) << std::endl;
@@ -1445,7 +1445,7 @@ bool simple_wallet::create_integrated(const std::vector<std::string>& args/* = s
   std::string keys = Common::asString(ba);
 
   /* create the integrated address the same way you make a public address */
-  std::string integratedAddress = Tools::Base58::encode_addr (CryptoNote::parameters::CRYPTONOTE_PUBLIC_ADDRESS_BASE58_PREFIX,
+  std::string integratedAddress = Tools::Base58::encode_addr (CryptoNote::parameters::PUBLIC_ADDRESS_BASE58_PREFIX,
                                                               paymentID + keys
   );
 
@@ -1462,7 +1462,7 @@ bool simple_wallet::export_keys(const std::vector<std::string>& args/* = std::ve
   m_wallet->getAccountKeys(keys);
 
   std::string secretKeysData = std::string(reinterpret_cast<char*>(&keys.spendSecretKey), sizeof(keys.spendSecretKey)) + std::string(reinterpret_cast<char*>(&keys.viewSecretKey), sizeof(keys.viewSecretKey));
-  std::string guiKeys = Tools::Base58::encode_addr(CryptoNote::parameters::CRYPTONOTE_PUBLIC_ADDRESS_BASE58_PREFIX, secretKeysData);
+  std::string guiKeys = Tools::Base58::encode_addr(CryptoNote::parameters::PUBLIC_ADDRESS_BASE58_PREFIX, secretKeysData);
 
   std::cout << "Private spend key: " << Common::podToHex(keys.spendSecretKey) << std::endl;
   std::cout << "Private view key: " <<  Common::podToHex(keys.viewSecretKey) << std::endl;

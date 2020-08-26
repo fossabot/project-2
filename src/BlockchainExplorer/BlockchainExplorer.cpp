@@ -460,7 +460,7 @@ uint64_t BlockchainExplorer::getRewardBlocksWindow() {
     throw std::system_error(make_error_code(CryptoNote::error::BlockchainExplorerErrorCodes::NOT_INITIALIZED));
   }
 
-  return parameters::CRYPTONOTE_REWARD_BLOCKS_WINDOW;
+  return parameters::REWARD_BLOCKS_WINDOW;
 }
 
 uint64_t BlockchainExplorer::getFullRewardMaxBlockSize(uint8_t majorVersion) {
@@ -468,7 +468,7 @@ uint64_t BlockchainExplorer::getFullRewardMaxBlockSize(uint8_t majorVersion) {
     throw std::system_error(make_error_code(CryptoNote::error::BlockchainExplorerErrorCodes::NOT_INITIALIZED));
   }
 
-  return parameters::CRYPTONOTE_BLOCK_GRANTED_FULL_REWARD_ZONE;
+  return parameters::BLOCK_GRANTED_FULL_REWARD_ZONE;
 }
 
 bool BlockchainExplorer::isSynchronized() {

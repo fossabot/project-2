@@ -21,6 +21,7 @@
 #include "crypto/crypto.h"
 #include "Common/CommandLine.h"
 #include "Common/StringTools.h"
+#include "Logging/FileLog.h"
 #include "Serialization/SerializationTools.h"
 
 #include "CryptoNoteFormatUtils.h"
