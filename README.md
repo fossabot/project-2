@@ -9,7 +9,7 @@
 ***
 
 ### Guides to Master
-- Build
+- [Build](https://github.com/project-en4orcer/project/wiki/Build)
 - Setup
 - Usage Guide
 
