@@ -8,14 +8,19 @@
 
 ***
 
-### Guides to Master
+### Docs & Guides
+> Master these, master life.
+
 - [Build](https://github.com/project-en4orcer/project/wiki/Build)
 - Setup
 - Usage Guide
+- [Developers Notes](https://github.com/project-en4orcer/project/wiki/Developers-Notes)
+- [Project Ideas](https://github.com/project-en4orcer/project-documents/blob/master/project-idea.md)
 
 ***
 
 ### Social
+> Follow every step we take.
 
 [![discord](https://github.com/project-en4orcer/Assets/blob/master/social-icons/bubble/discord-50px.png)](https://discord.gg/PHyGJjg)
 [![github](https://github.com/project-en4orcer/Assets/blob/master/social-icons/bubble/github-50px.png)](https://github.com/project-en4orcer)
