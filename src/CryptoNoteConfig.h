@@ -22,8 +22,8 @@ namespace CryptoNote {
     const size_t   MINED_COINS_UNLOCK_WINDOW = 10;
     const uint64_t DEFAULT_TX_SPENDABLE_AGE = 10;
 
-    /* 200M */
-    const uint64_t MONEY_SUPPLY = UINT64_C(200000000000000); 
+    /* 500M */
+    const uint64_t MONEY_SUPPLY = UINT64_C(500000000000000); 
     const size_t   MINIMUM_MIXIN = 4;
     const size_t   DECIMAL_POINT = 6;
     /* smallest atomic unit */
@@ -90,20 +90,18 @@ namespace CryptoNote {
 
   /* start reward */
 	const uint64_t START_BLOCK_REWARD = (UINT64_C(5000) * parameters::POINT);
-  /* block 1 premine */
-	const uint64_t FOUNDATION_TRUST = (UINT64_C(12000000) * parameters::COIN);
-  /* max reward */
-	const uint64_t MAX_BLOCK_REWARD = (UINT64_C(15) * parameters::COIN);
-  /* aprox. 1 month */  
-	const uint64_t REWARD_INCREASE_INTERVAL = (UINT64_C(21900));
+  /* block 1 premine = 15m */
+	const uint64_t FOUNDATION_TRUST = (UINT64_C(15000000) * parameters::COIN);
+  /* ~3 month */  
+	const uint64_t REWARD_INCREASE_INTERVAL = (UINT64_C(21900) * 3);
 
 	const char     PROJECT_NAME[] = "conceal";
 	const char     GENESIS_COINBASE_TX_HEX[] = "010a01ff0001c096b102029b2e4c0281c0b02e7c53291a94d1d0cbff8883f8024f5142ee494ffbbd08807121017d6775185749e95ac2d70cae3f29e0e46f430ab648abbe9fdc61d8e7437c60f8";
 	const uint32_t GENESIS_NONCE = 10000;
 	const uint64_t GENESIS_TIMESTAMP = 1527078920;
 
-	const int      P2P_DEFAULT_PORT = 15000;
-	const int      RPC_DEFAULT_PORT = 16000;
+	const int      P2P_DEFAULT_PORT = 39999;
+	const int      RPC_DEFAULT_PORT = 40000;
 
 	const uint8_t  P2P_CURRENT_VERSION = 1;
 	const uint8_t  P2P_MINIMUM_VERSION = 1;

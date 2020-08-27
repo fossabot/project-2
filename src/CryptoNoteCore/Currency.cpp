@@ -135,15 +135,19 @@ namespace CryptoNote
 
   uint64_t Currency::baseRewardFunction(uint64_t alreadyGeneratedCoins, uint32_t height) const
   {
-    if (height == 1)
-    {
+    if (height == 1) {
       return FOUNDATION_TRUST;
     }
 
     uint64_t incrIntervals = static_cast<uint64_t>(height) / REWARD_INCREASE_INTERVAL;
     assert(incrIntervals < REWARD_INCREASING_FACTOR.size());
     uint64_t base_reward = START_BLOCK_REWARD + REWARD_INCREASING_FACTOR[incrIntervals];
-    base_reward = (std::min)(base_reward, MAX_BLOCK_REWARD);
+    /**
+     * If in future we was to cap the Max Block Reward a miner can earn, this is where
+     *    and how to do it.
+     * uint64_t mBR = UINT64_C(10) * CryptoNote::parameters::POINT;
+     * base_reward = (std::min)(base_reward, mBR);
+     */
     base_reward = (std::min)(base_reward, m_moneySupply - alreadyGeneratedCoins);
 
     return base_reward;
