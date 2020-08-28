@@ -86,9 +86,11 @@ else()
     set(DEBUG_FLAGS "-g3 -O0")
   endif()
   set(RELEASE_FLAGS "-g3 -O0")
-  
 endif()
 
+if(${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
+    set(CMAKE_EXE_LINKER_FLAGS "-pthread")
+endif()
 
 if(APPLE)
   add_definitions(/DHAVE_ROTR)
