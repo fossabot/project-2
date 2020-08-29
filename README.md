@@ -16,6 +16,7 @@
 - Usage Guide
 - [Developers Notes](https://github.com/project-en4orcer/project/wiki/Developers-Notes)
 - [Project Ideas](https://github.com/project-en4orcer/project-documents/blob/master/project-idea.md)
+- [Testnet Environment](https://github.com/project-en4orcer/project/wiki/Testnet-Environment)
 
 ***
 
