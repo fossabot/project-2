@@ -5,6 +5,7 @@
 [![Build status](https://ci.appveyor.com/api/projects/status/6lpfel35swkpuw1l?svg=true)](https://ci.appveyor.com/project/En4orcer/project)
 [![Windows Build](https://img.shields.io/badge/Windows%20Build-DOWNLOAD-blue)](https://ci.appveyor.com/project/En4orcer/project/build/artifacts)
 ![version](https://img.shields.io/badge/Version-0.0.1-blue)
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fproject-en4orcer%2Fproject.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2Fproject-en4orcer%2Fproject?ref=badge_shield)
 
 ***
 
@@ -38,3 +39,7 @@
 - [Masari](https://getmasari.org/)
 - [Monero](https://www.getmonero.org/)
 - [TurtleCoin](https://turtlecoin.lol/)
+
+
+## License
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fproject-en4orcer%2Fproject.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2Fproject-en4orcer%2Fproject?ref=badge_large)
